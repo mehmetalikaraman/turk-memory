@@ -79,8 +79,23 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:#f8f7f4;font-famil
 .card-wrap.hint-glow .c-front{animation:hintPulse .45s ease infinite;}
 @keyframes reveal{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 .layer-reveal{animation:reveal .3s ease;}
-.c-front,.c-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.c-front{background:var(--card2);border:1.5px solid var(--border);}
+.c-front,.c-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.c-front{
+  background:linear-gradient(135deg,#6e68d4 0%,#534AB7 40%,#3d35a0 70%,#2a2480 100%);
+  border:1.5px solid rgba(255,255,255,0.25);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.35),inset 0 -1px 0 rgba(0,0,0,0.2),0 4px 12px rgba(83,74,183,0.4);
+  position:relative;
+}
+.c-front::before{
+  content:'';position:absolute;inset:0;border-radius:10px;
+  background:radial-gradient(ellipse at 35% 30%,rgba(255,255,255,0.22) 0%,transparent 60%);
+  pointer-events:none;
+}
+.c-front::after{
+  content:'✦';position:absolute;
+  font-size:clamp(10px,2.5vw,20px);color:rgba(255,255,255,0.3);
+  text-shadow:0 0 8px rgba(255,255,255,0.5);
+}
 .c-back{transform:rotateY(180deg);padding:2px;}
 .card-wrap.matched .c-back{border:2px solid #639922 !important;background:#EAF3DE !important;border-radius:9px;}
 
@@ -141,8 +156,8 @@ const THEMES={
   insaat:{name:'İnşaat',icon:'🏗️',color:'#5F5E5A',bg:'#F1EFE8'},
   son:{name:'Ustalık Finali',icon:'🏆',color:'#412402',bg:'#FAEEDA'},
 };
-const THEME_LEVELS={10:'meyve',20:'hayvan',30:'esya',40:'islami',50:'okul',60:'tasit',70:'sebze',80:'muzik',90:'spor',100:'yiyecek',110:'uzay',120:'deniz',130:'cicek',140:'teknoloji',150:'doga',160:'tatil',170:'matematik',180:'mutfak',190:'sanat',200:'tarih',210:'cografi',220:'moda',230:'insaat',240:'son',250:'son'};
-function getTheme(lvl){const k=THEME_LEVELS[lvl]||'turk';return{key:k,...THEMES[k]};}
+const THEME_LEVELS={60:'meyve',120:'hayvan',180:'esya',240:'islami',300:'okul',360:'tasit',420:'sebze',480:'muzik',540:'spor',600:'yiyecek',660:'uzay',720:'deniz',780:'cicek',840:'teknoloji',900:'doga',960:'tatil',1020:'matematik',1080:'mutfak',1140:'sanat',1200:'tarih',1260:'cografi',1320:'moda',1380:'insaat',1440:'son',1500:'son'};
+function getTheme(lvl){const k=THEME_LEVELS[Math.ceil(lvl/60)*60]||'turk';return{key:k,...THEMES[k]};}
 
 // ═══════════ MOTİFLER ═══════════
 const MOTIF_SETS={
@@ -238,17 +253,17 @@ Object.keys(THEMES).forEach(k=>{if(!MOTIF_SETS[k])MOTIF_SETS[k]=MOTIF_SETS.turk;
 // ═══════════ LEVEL KONFİG ═══════════
 function getLevelConfig(lvl){
   let cols,rows,pairs,hints,layers;
-  if(lvl<=10){cols=2;rows=2;pairs=2;layers=1;}
-  else if(lvl<=25){cols=4;rows=2;pairs=4;layers=1;}
-  else if(lvl<=34){cols=4;rows=4;pairs=8;layers=1;}
-  else if(lvl<=80){cols=4;rows=4;pairs=8;layers=2;}
-  else if(lvl<=110){cols=5;rows=4;pairs=10;layers=2;}
-  else if(lvl<=140){cols=6;rows=4;pairs=12;layers=3;}
-  else if(lvl<=170){cols=6;rows=6;pairs=18;layers=3;}
-  else if(lvl<=200){cols=8;rows=4;pairs=16;layers=3;}
-  else if(lvl<=225){cols=8;rows=6;pairs=24;layers=4;}
-  else{cols=10;rows=5;pairs=25;layers=4;}
-  if(lvl<=5)hints=0;else if(lvl<=30)hints=3;else if(lvl<=80)hints=2;else hints=3;
+  if(lvl<=3){cols=2;rows=2;pairs=2;layers=1;}
+  else if(lvl<=8){cols=4;rows=2;pairs=4;layers=1;}
+  else if(lvl<=20){cols=4;rows=4;pairs=8;layers=1;}
+  else if(lvl<=60){cols=4;rows=4;pairs=8;layers=2;}
+  else if(lvl<=150){cols=5;rows=4;pairs=10;layers=2;}
+  else if(lvl<=300){cols=6;rows=4;pairs=12;layers=3;}
+  else if(lvl<=500){cols=6;rows=6;pairs=18;layers=3;}
+  else if(lvl<=750){cols=8;rows=4;pairs=16;layers=3;}
+  else if(lvl<=1100){cols=8;rows=6;pairs=24;layers=4;}
+  else{cols=10;rows=5;pairs=25;layers=5;}
+  if(lvl<=3)hints=0;else if(lvl<=20)hints=3;else if(lvl<=150)hints=2;else hints=3;
   return{cols,rows,pairs,hints,layers};
 }
 
@@ -264,15 +279,15 @@ function showMenu(){
   document.getElementById('game-screen').style.display='none';
   const el=document.getElementById('menu-screen');
   el.style.display='block';
-  const pct=Math.round(sv.done.length/250*100);
-  const tiers=[[1,10],[11,25],[26,50],[51,80],[81,110],[111,140],[141,170],[171,200],[201,225],[226,250]];
-  let h=`<div class="menu-header"><div class="logo">🕌</div><h1>Türk Motifleri Memory</h1><p>250 Level · Offline · Tema Sistemi</p></div>
-  <div class="progress-bar-wrap"><span class="pb-label">İlerleme</span><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div><span class="pb-count">${sv.done.length}/250</span></div>`;
+  const pct=Math.round(sv.done.length/1500*100);
+  const tiers=[[1,60],[61,120],[121,180],[181,240],[241,300],[301,360],[361,420],[421,480],[481,540],[541,600],[601,660],[661,720],[721,780],[781,840],[841,900],[901,960],[961,1020],[1021,1080],[1081,1140],[1141,1200],[1201,1260],[1261,1320],[1321,1380],[1381,1440],[1441,1500]];
+  let h=`<div class="menu-header"><div class="logo">🕌</div><h1>Türk Motifleri Memory</h1><p>1500 Level · Offline · Tema Sistemi</p></div>
+  <div class="progress-bar-wrap"><span class="pb-label">İlerleme</span><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div><span class="pb-count">${sv.done.length}/1500</span></div>`;
   tiers.forEach(([s,e])=>{
     h+=`<div class="tier-section"><div class="tier-label">${s}–${e}. Levellar</div><div class="level-grid">`;
     for(let l=s;l<=e;l++){
       const done=sv.done.includes(l),unlocked=l<=sv.max,isCur=l===sv.max&&!done;
-      const th=getTheme(l),isSpecial=l%10===0;
+      const th=getTheme(l),isSpecial=l%60===0;
       let c='lvl-btn';
       if(done)c+=' completed';else if(isCur)c+=' current unlocked';else if(unlocked)c+=' unlocked';else c+=' locked';
       if(isSpecial&&unlocked)c+=' special';
@@ -287,7 +302,7 @@ function showMenu(){
 // ═══════════ LEVEL BAŞLAT ═══════════
 function startLevel(lvl){
   const th=getTheme(lvl);
-  if(lvl%10===0){showIntro(lvl,th);}else{playLevel(lvl,th);}
+  if(lvl%60===0){showIntro(lvl,th);}else{playLevel(lvl,th);}
 }
 
 function showIntro(lvl,th){
@@ -402,7 +417,7 @@ function flip(si,uid,el){
           if(g.matched===g.totalPairs)setTimeout(showWin,350);
           else setMsg(g.cfg.layers>1?'Üstteki kartları önce eşleştir!':'Kartları eşleştir!','');
         },360);
-      },100);
+      },1000);
     } else {
       setMsg('Eşleşmedi!','no');
       setTimeout(()=>{
@@ -478,14 +493,14 @@ function showWin(){
   if(g.lvl>=sv.max)sv.max=g.lvl+1;
   saveSv(sv);
   const stars=g.moves<=g.totalPairs+3?3:g.moves<=g.totalPairs*2?2:1;
-  const isLast=g.lvl===250;
+  const isLast=g.lvl===1500;
   const nextTh=!isLast?getTheme(g.lvl+1):null;
   document.getElementById('game-screen').innerHTML=`<div class="screen anim-in"><div class="win-screen">
     <div class="confetti-container" id="cc"></div>
     <div style="font-size:30px;margin-bottom:.3rem">${'⭐'.repeat(stars)}</div>
     <div style="font-size:26px;margin-bottom:.3rem">${g.th.icon}</div>
     <h2>Seviye ${g.lvl} Tamamlandı!</h2>
-    <p>${isLast?'Tüm 250 seviyeyi bitirdin! Türk Hafıza Ustasısın!':(!isLast&&(g.lvl+1)%10===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
+    <p>${isLast?'Tüm 1500 seviyeyi bitirdin! Türk Hafıza Galibisin!':(!isLast&&(g.lvl+1)%60===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
     <div class="win-stats">
       <div class="wst"><div class="wl">Hamle</div><div class="wv">${g.moves}</div></div>
       <div class="wst"><div class="wl">Çift</div><div class="wv">${g.matched}</div></div>
