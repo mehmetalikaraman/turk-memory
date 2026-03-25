@@ -360,32 +360,66 @@ function renderGame(){
   buildSlots();
 }
 
+// Per-layer card front configs
+const LAYER_FRONTS=[
+  // Layer 0 (top) — deep purple 3D
+  {grad:'linear-gradient(135deg,#7b74e0 0%,#534AB7 45%,#3529a0 100%)',
+   shine:'radial-gradient(ellipse at 38% 28%,rgba(255,255,255,0.28) 0%,transparent 58%)',
+   border:'rgba(255,255,255,0.28)',shadow:'rgba(83,74,183,0.45)',icon:'✦',iconColor:'rgba(255,255,255,0.32)'},
+  // Layer 1 — bronze/copper
+  {grad:'linear-gradient(135deg,#c98a3a 0%,#a06520 45%,#7a4a10 100%)',
+   shine:'radial-gradient(ellipse at 38% 28%,rgba(255,220,120,0.3) 0%,transparent 58%)',
+   border:'rgba(255,200,80,0.35)',shadow:'rgba(120,80,20,0.45)',icon:'◈',iconColor:'rgba(255,210,100,0.4)'},
+  // Layer 2 — dark teal/emerald
+  {grad:'linear-gradient(135deg,#2dab88 0%,#0f6e56 45%,#09503d 100%)',
+   shine:'radial-gradient(ellipse at 38% 28%,rgba(120,255,200,0.22) 0%,transparent 58%)',
+   border:'rgba(80,220,170,0.3)',shadow:'rgba(10,80,60,0.45)',icon:'❋',iconColor:'rgba(100,240,190,0.38)'},
+  // Layer 3 — crimson/ruby
+  {grad:'linear-gradient(135deg,#d44a4a 0%,#a32d2d 45%,#7a1a1a 100%)',
+   shine:'radial-gradient(ellipse at 38% 28%,rgba(255,150,150,0.25) 0%,transparent 58%)',
+   border:'rgba(255,120,120,0.3)',shadow:'rgba(120,20,20,0.45)',icon:'✺',iconColor:'rgba(255,160,160,0.38)'},
+  // Layer 4 — midnight/obsidian
+  {grad:'linear-gradient(135deg,#4a4a6a 0%,#26215c 45%,#141030 100%)',
+   shine:'radial-gradient(ellipse at 38% 28%,rgba(180,160,255,0.25) 0%,transparent 58%)',
+   border:'rgba(160,140,255,0.3)',shadow:'rgba(20,16,50,0.5)',icon:'⬡',iconColor:'rgba(180,160,255,0.4)'},
+];
+function layerFront(li){return LAYER_FRONTS[Math.min(li,LAYER_FRONTS.length-1)];}
+
+function makeCardEl(card, li, totalLayers, si, isTop, isFlipped){
+  const lf = layerFront(li);
+  const ox = li*-3, oy = li*-4;
+  const w = document.createElement('div');
+  w.className = `card-wrap${!isTop ? ' locked-card' : ''}`;
+  w.dataset.si = si; w.dataset.uid = card.uid; w.dataset.li = li;
+  w.style.cssText = `position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
+  w.innerHTML = `<div class="card-inner">
+    <div class="c-front" style="
+      background:${lf.grad};
+      border:1.5px solid ${lf.border};
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.3),inset 0 -1px 0 rgba(0,0,0,0.25),0 4px 14px ${lf.shadow};
+      position:relative;
+    ">
+      <div style="position:absolute;inset:0;border-radius:10px;background:${lf.shine};pointer-events:none;"></div>
+      <span style="position:absolute;font-size:clamp(10px,2.5vw,20px);color:${lf.iconColor};text-shadow:0 0 8px ${lf.iconColor};">${lf.icon}</span>
+    </div>
+    <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
+  </div>`;
+  if(isTop) w.addEventListener('click', () => flipAny(si, card.uid, li, w));
+  return w;
+}
+
 function buildSlots(){
-  const g=gs,cg=document.getElementById('cg');
+  const g=gs, cg=document.getElementById('cg');
   cg.innerHTML='';
   g.slots.forEach((stack,si)=>{
     const slot=document.createElement('div');
     slot.className='card-slot';
     const se=document.createElement('div');
     se.className='card-stack';
+    const topLi = stack.length-1;
     stack.forEach((card,li)=>{
-      const isTop=li===stack.length-1;
-      const ox=li*-3,oy=li*-4;
-      const w=document.createElement('div');
-      w.className=`card-wrap${!isTop?' locked-card':''}`;
-      w.dataset.si=si;w.dataset.uid=card.uid;
-      w.style.cssText=`position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
-      w.innerHTML=`<div class="card-inner">
-        <div class="c-front" style="border:1.5px solid ${!isTop?'#c8c5bc;border-style:dashed;opacity:.65':'#c8c5bc'};">
-          <svg viewBox="0 0 100 100" width="50%" height="50%">
-            <rect x="8" y="8" width="84" height="84" rx="9" fill="none" stroke="#c8c5bc" stroke-width="5"/>
-            <path d="M8 8 L92 92 M92 8 L8 92" stroke="#e0ddd6" stroke-width="4"/>
-            ${isTop?`<circle cx="50" cy="50" r="16" fill="none" stroke="#c8c5bc" stroke-width="4"/>`:`<text x="50" y="58" text-anchor="middle" font-size="26" fill="#c8c5bc">🔒</text>`}
-          </svg>
-        </div>
-        <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
-      </div>`;
-      if(isTop)w.addEventListener('click',()=>flip(si,card.uid,w));
+      const isTop = li===topLi;
+      const w = makeCardEl(card, li, stack.length, si, isTop, false);
       se.appendChild(w);
     });
     slot.appendChild(se);
@@ -395,12 +429,14 @@ function buildSlots(){
 
 function getTop(si){const s=gs.slots[si];return s&&s.length?s[s.length-1]:null;}
 
-function flip(si,uid,el){
+function flipAny(si,uid,li,el){
   const g=gs;
   if(g.lock||el.classList.contains('flipped'))return;
-  const card=getTop(si);if(!card||card.uid!==uid)return;
+  const stack=g.slots[si];
+  const card=stack[li];
+  if(!card||card.uid!==uid)return;
   el.classList.add('flipped');el.classList.remove('hint-glow');
-  g.flipped.push({si,uid,el,card});
+  g.flipped.push({si,uid,li,el,card});
   if(g.flipped.length===2){
     g.lock=true;g.moves++;
     document.getElementById('mv').textContent=g.moves;
@@ -415,9 +451,9 @@ function flip(si,uid,el){
           rebSlot(a.si);rebSlot(b.si);
           g.flipped=[];g.lock=false;
           if(g.matched===g.totalPairs)setTimeout(showWin,350);
-          else setMsg(g.cfg.layers>1?'Üstteki kartları önce eşleştir!':'Kartları eşleştir!','');
+          else setMsg(g.cfg.layers>1?'Kartları eşleştir!':'Kartları eşleştir!','');
         },360);
-      },1000);
+      },500);
     } else {
       setMsg('Eşleşmedi!','no');
       setTimeout(()=>{
@@ -425,7 +461,7 @@ function flip(si,uid,el){
         setTimeout(()=>{
           a.el.classList.remove('flipped','shaking');b.el.classList.remove('flipped','shaking');
           g.flipped=[];g.lock=false;
-          setMsg(g.cfg.layers>1?'Üstteki kartları önce eşleştir!':'Kartları eşleştir!','');
+          setMsg(g.cfg.layers>1?'Kartları eşleştir!':'Kartları eşleştir!','');
         },380);
       },150);
     }
@@ -438,26 +474,13 @@ function rebSlot(si){
   const slotEl=cg.querySelectorAll('.card-slot')[si];if(!slotEl)return;
   const se=slotEl.querySelector('.card-stack');se.innerHTML='';
   const stack=gs.slots[si];
+  const topLi=stack.length-1;
   stack.forEach((card,li)=>{
-    const isTop=li===stack.length-1;
-    const ox=li*-3,oy=li*-4;
-    const w=document.createElement('div');
-    w.className=`card-wrap${!isTop?' locked-card':''}`;
-    w.dataset.si=si;w.dataset.uid=card.uid;
-    w.style.cssText=`position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
+    const isTop=li===topLi;
+    const w=makeCardEl(card,li,stack.length,si,isTop,false);
     if(isTop&&stack.length<gs.cfg.layers)w.classList.add('layer-reveal');
-    w.innerHTML=`<div class="card-inner">
-      <div class="c-front" style="border:1.5px solid ${!isTop?'#c8c5bc;border-style:dashed;opacity:.65':'#c8c5bc'};">
-        <svg viewBox="0 0 100 100" width="50%" height="50%">
-          <rect x="8" y="8" width="84" height="84" rx="9" fill="none" stroke="#c8c5bc" stroke-width="5"/>
-          <path d="M8 8 L92 92 M92 8 L8 92" stroke="#e0ddd6" stroke-width="4"/>
-          ${isTop?`<circle cx="50" cy="50" r="16" fill="none" stroke="#c8c5bc" stroke-width="4"/>`:`<text x="50" y="58" text-anchor="middle" font-size="26" fill="#c8c5bc">🔒</text>`}
-        </svg>
-      </div>
-      <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
-    </div>`;
-    if(isTop)w.addEventListener('click',()=>flip(si,card.uid,w));
     se.appendChild(w);
+  });
   });
 }
 
@@ -500,7 +523,7 @@ function showWin(){
     <div style="font-size:30px;margin-bottom:.3rem">${'⭐'.repeat(stars)}</div>
     <div style="font-size:26px;margin-bottom:.3rem">${g.th.icon}</div>
     <h2>Seviye ${g.lvl} Tamamlandı!</h2>
-    <p>${isLast?'Tüm 1500 seviyeyi bitirdin! Türk Hafıza Galibisin!':(!isLast&&(g.lvl+1)%60===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
+    <p>${isLast?'Tüm 1500 seviyeyi bitirdin! Türk Hafıza Grandmasterisin!':(!isLast&&(g.lvl+1)%60===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
     <div class="win-stats">
       <div class="wst"><div class="wl">Hamle</div><div class="wv">${g.moves}</div></div>
       <div class="wst"><div class="wl">Çift</div><div class="wv">${g.matched}</div></div>
