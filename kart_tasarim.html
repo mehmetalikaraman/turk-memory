@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kart Tasarımı</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,sans-serif;background:#1a1918;padding:1.5rem 1rem;}
+h2{font-size:15px;font-weight:500;color:#a09d96;margin-bottom:.5rem;text-align:center;letter-spacing:.04em;text-transform:uppercase;}
+.section{margin-bottom:2rem;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:400px;margin:0 auto;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:0 auto;}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:400px;margin:0 auto;}
+.card-slot{aspect-ratio:1;cursor:pointer;perspective:700px;}
+.card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+.card-slot.open .card-inner{transform:rotateY(180deg);}
+.cf,.cb{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:10px;overflow:hidden;}
+.cb{transform:rotateY(180deg);}
+.hint{font-size:12px;color:#6b6965;text-align:center;margin-top:.75rem;}
+</style>
+</head>
+<body>
+
+<div class="section">
+  <h2>Büyük Kart — 2×2</h2>
+  <div class="grid-3" id="g-lg"></div>
+</div>
+
+<div class="section">
+  <h2>Orta Kart — 4×4</h2>
+  <div class="grid-4" id="g-md"></div>
+</div>
+
+<div class="section">
+  <h2>Küçük Kart — 6×6+</h2>
+  <div class="grid-6" id="g-sm"></div>
+</div>
+
+<p class="hint">Kartlara tıkla → çevrilmiş hali görmek için</p>
+
+<script>
+function cardFront(s){
+  const sm=s==='sm', md=s==='md';
+  const str=sm?22:28, r1=sm?.8:1.2, r2=sm?.7:1, cc=sm?6:8, ci=sm?3:4;
+  const cw=sm?1:1.5, cr=sm?.7:1;
+  return `<svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <pattern id="wd${s}" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+    <rect width="6" height="6" fill="#0B2550"/>
+    <line x1="0" y1="1" x2="6" y2="1" stroke="#0E3070" stroke-width=".9" opacity=".65"/>
+    <line x1="0" y1="3" x2="6" y2="3" stroke="#09204A" stroke-width=".6" opacity=".45"/>
+    <line x1="0" y1="5" x2="6" y2="5" stroke="#0E3070" stroke-width=".7" opacity=".55"/>
+  </pattern>
+  <pattern id="gr${s}" x="0" y="0" width="18" height="55" patternUnits="userSpaceOnUse">
+    <ellipse cx="4" cy="18" rx="2.5" ry="20" fill="#0F3A8A" opacity=".13"/>
+    <ellipse cx="11" cy="32" rx="2" ry="24" fill="#09204A" opacity=".1"/>
+    <ellipse cx="16" cy="8"  rx="1.5" ry="13" fill="#0F3A8A" opacity=".09"/>
+  </pattern>
+</defs>
+
+<!-- Zemin ahşap doku -->
+<rect x="0" y="0" width="100" height="100" rx="10" fill="url(#wd${s})"/>
+<rect x="0" y="0" width="100" height="100" rx="10" fill="url(#gr${s})"/>
+
+<!-- Dış altın çerçeve -->
+<rect x="3" y="3" width="94" height="94" rx="8" fill="none" stroke="#C9A84C" stroke-width="${r1}"/>
+<!-- İç ince çerçeve -->
+<rect x="7" y="7" width="86" height="86" rx="6" fill="none" stroke="#C9A84C" stroke-width="${r2}" opacity=".55"/>
+
+${!sm?`
+<!-- Köşe rozetleri -->
+<g opacity=".88">
+  ${['14 14','86 14','14 86','86 86'].map(p=>{
+    const[cx,cy]=p.split(' ');
+    const R=md?5:6.5, r=md?2:2.8, arm=md?6:8;
+    return `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#C9A84C" stroke-width="${md?.9:1.1}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#C9A84C"/>
+    <line x1="${cx}" y1="${+cy-arm}" x2="${cx}" y2="${+cy+arm}" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <line x1="${+cx-arm}" y1="${cy}" x2="${+cx+arm}" y2="${cy}" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>`;
+  }).join('')}
+</g>`:``}
+
+<!-- Merkez: 8 kollu Türk yıldızı -->
+<g transform="translate(50,50)">
+  <!-- Dış sekizgen -->
+  <polygon points="0,-${str} ${str*.707},-${str*.707} ${str},0 ${str*.707},${str*.707} 0,${str} -${str*.707},${str*.707} -${str},0 -${str*.707},-${str*.707}"
+    fill="none" stroke="#C9A84C" stroke-width="${r1}" opacity=".7"/>
+
+  <!-- 8 kollu yıldız dolgu -->
+  <polygon points="0,-${str} ${str*.22},-${str*.22} ${str},0 ${str*.22},${str*.22} 0,${str} -${str*.22},${str*.22} -${str},0 -${str*.22},-${str*.22}"
+    fill="#C9A84C" opacity=".82"/>
+
+  <!-- Çakışık iki kare (çini motifi) -->
+  <rect x="${-str*.52}" y="${-str*.52}" width="${str*1.04}" height="${str*1.04}"
+    fill="none" stroke="#E8C96A" stroke-width="${r2}"/>
+  <rect x="${-str*.52}" y="${-str*.52}" width="${str*1.04}" height="${str*1.04}"
+    fill="none" stroke="#E8C96A" stroke-width="${r2}" transform="rotate(45)"/>
+
+  <!-- Merkez daire -->
+  <circle r="${cc}" fill="#0B2550" stroke="#C9A84C" stroke-width="${cw}"/>
+  <circle r="${ci}" fill="#C9A84C"/>
+</g>
+
+${!sm?`
+<!-- Üst-alt küçük yıldız aksan -->
+<g fill="#C9A84C" opacity=".5">
+  <polygon points="50,${md?11:9} 51.6,${md?16:14} 56.5,${md?16:14} 52.6,${md?19:17} 54.2,${md?24:22} 50,${md?21:19} 45.8,${md?24:22} 47.4,${md?19:17} 43.5,${md?16:14} 48.4,${md?16:14}"/>
+  <polygon points="50,${md?89:91} 51.6,${md?84:86} 56.5,${md?84:86} 52.6,${md?81:83} 54.2,${md?76:78} 50,${md?79:81} 45.8,${md?76:78} 47.4,${md?81:83} 43.5,${md?84:86} 48.4,${md?84:86}"/>
+</g>`:``}
+
+<!-- Yüzey parlaklık -->
+<rect x="0" y="0" width="100" height="52" rx="10" fill="white" opacity=".04"/>
+<rect x="0" y="0" width="52" height="100" fill="white" opacity=".015"/>
+</svg>`;
+}
+
+const MOTIF_SVGS=[
+  `<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="9" fill="#FAECE7"/><ellipse cx="50" cy="62" rx="22" ry="28" fill="#D85A30"/><ellipse cx="32" cy="48" rx="16" ry="24" fill="#E97A50" transform="rotate(-22 32 48)"/><ellipse cx="68" cy="48" rx="16" ry="24" fill="#E97A50" transform="rotate(22 68 48)"/><ellipse cx="50" cy="42" rx="11" ry="20" fill="#BA4520"/><rect x="46" y="78" width="8" height="18" rx="4" fill="#3B6D11"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="9" fill="#E6F1FB"/><rect x="6" y="6" width="88" height="88" rx="8" fill="none" stroke="#185FA5" stroke-width="3"/><rect x="18" y="18" width="64" height="64" rx="5" fill="none" stroke="#378ADD" stroke-width="2"/><circle cx="50" cy="50" r="17" fill="none" stroke="#185FA5" stroke-width="2.5"/><circle cx="50" cy="50" r="6" fill="#185FA5"/><line x1="6" y1="50" x2="94" y2="50" stroke="#378ADD" stroke-width="1.5"/><line x1="50" y1="6" x2="50" y2="94" stroke="#378ADD" stroke-width="1.5"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="9" fill="#FAEEDA"/><circle cx="50" cy="52" r="36" fill="#EF9F27"/><circle cx="65" cy="41" r="28" fill="#FAEEDA"/><polygon points="50,16 54,30 68,30 57,39 61,53 50,44 39,53 43,39 32,30 46,30" fill="#EF9F27"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="9" fill="#EEEDFE"/><polygon points="50,6 56,30 80,30 61,46 68,70 50,56 32,70 39,46 20,30 44,30" fill="#AFA9EC"/><polygon points="50,14 55,32 74,32 59,43 64,61 50,51 36,61 41,43 26,32 45,32" fill="#7F77DD"/><polygon points="50,22 54,34 66,34 57,41 60,53 50,46 40,53 43,41 34,34 46,34" fill="#534AB7"/><circle cx="50" cy="50" r="9" fill="#EEEDFE"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="9" fill="#E6F1FB"/><circle cx="50" cy="50" r="46" fill="#185FA5"/><circle cx="50" cy="50" r="32" fill="white"/><circle cx="50" cy="50" r="20" fill="#185FA5"/><circle cx="50" cy="50" r="11" fill="#2C2C2A"/><circle cx="44" cy="44" r="5" fill="white"/></svg>`,
+  `<svg viewBox="0 0 100 100" width="100%" height="100%"><rect width="100" height="100" rx="9" fill="#FBEAF0"/><ellipse cx="50" cy="50" rx="44" ry="44" fill="#F4C0D1"/><path d="M4 50 Q18 24 32 50 Q46 76 60 50 Q74 24 88 50" fill="none" stroke="#993556" stroke-width="3.5"/><path d="M4 36 Q18 10 32 36 Q46 62 60 36 Q74 10 88 36" fill="none" stroke="#ED93B1" stroke-width="3"/></svg>`,
+];
+let mi=0;
+
+function build(id,count,size){
+  const el=document.getElementById(id);
+  for(let i=0;i<count;i++){
+    const slot=document.createElement('div');
+    slot.className='card-slot';
+    const motif=MOTIF_SVGS[mi%MOTIF_SVGS.length]; mi++;
+    slot.innerHTML=`<div class="card-inner">
+      <div class="cf">${cardFront(size)}</div>
+      <div class="cb">${motif}</div>
+    </div>`;
+    slot.addEventListener('click',()=>slot.classList.toggle('open'));
+    el.appendChild(slot);
+  }
+}
+
+build('g-lg',3,'lg');
+build('g-md',4,'md');
+build('g-sm',6,'sm');
+</script>
+</body>
+</html>
