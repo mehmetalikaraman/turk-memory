@@ -65,12 +65,12 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:#f8f7f4;font-famil
 .msg-bar.no{color:var(--red);}
 
 .card-grid{display:grid;}
-.card-slot{position:relative;aspect-ratio:1;overflow:hidden;}
-.card-stack{position:relative;width:100%;height:100%;overflow:hidden;}
-.card-wrap{position:absolute;top:0;left:0;width:100%;height:100%;cursor:pointer;}
+.card-slot{position:relative;aspect-ratio:1;}
+.card-stack{position:relative;width:100%;height:100%;}
+.card-wrap{position:absolute;width:100%;height:100%;cursor:pointer;}
 .card-wrap.locked-card{cursor:not-allowed;}
-.card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .36s cubic-bezier(.4,0,.2,1);}
-.card-wrap.flipped .card-inner,.card-wrap.matched .card-inner{transform:rotateY(180deg);-webkit-transform:rotateY(180deg);}
+.card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .36s cubic-bezier(.4,0,.2,1);}
+.card-wrap.flipped .card-inner,.card-wrap.matched .card-inner{transform:rotateY(180deg);}
 @keyframes vanish{0%{transform:rotateY(180deg) scale(1);opacity:1;}50%{transform:rotateY(180deg) scale(1.16);opacity:1;}100%{transform:rotateY(180deg) scale(0);opacity:0;}}
 .card-wrap.vanishing .card-inner{animation:vanish .36s ease forwards;}
 @keyframes shake{0%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}100%{transform:translateX(0);}}
@@ -79,23 +79,8 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:#f8f7f4;font-famil
 .card-wrap.hint-glow .c-front{animation:hintPulse .45s ease infinite;}
 @keyframes reveal{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 .layer-reveal{animation:reveal .3s ease;}
-.c-front,.c-back{position:absolute;top:0;left:0;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.c-front{
-  background:linear-gradient(135deg,#6e68d4 0%,#534AB7 40%,#3d35a0 70%,#2a2480 100%);
-  border:1.5px solid rgba(255,255,255,0.25);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.35),inset 0 -1px 0 rgba(0,0,0,0.2),0 4px 12px rgba(83,74,183,0.4);
-  position:relative;
-}
-.c-front::before{
-  content:'';position:absolute;inset:0;border-radius:10px;
-  background:radial-gradient(ellipse at 35% 30%,rgba(255,255,255,0.22) 0%,transparent 60%);
-  pointer-events:none;
-}
-.c-front::after{
-  content:'✦';position:absolute;
-  font-size:clamp(10px,2.5vw,20px);color:rgba(255,255,255,0.3);
-  text-shadow:0 0 8px rgba(255,255,255,0.5);
-}
+.c-front,.c-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.c-front{background:var(--card2);border:1.5px solid var(--border);}
 .c-back{transform:rotateY(180deg);padding:2px;}
 .card-wrap.matched .c-back{border:2px solid #639922 !important;background:#EAF3DE !important;border-radius:9px;}
 
@@ -156,13 +141,62 @@ const THEMES={
   insaat:{name:'İnşaat',icon:'🏗️',color:'#5F5E5A',bg:'#F1EFE8'},
   son:{name:'Ustalık Finali',icon:'🏆',color:'#412402',bg:'#FAEEDA'},
 };
-const THEME_LEVELS={60:'meyve',120:'hayvan',180:'esya',240:'islami',300:'okul',360:'tasit',420:'sebze',480:'muzik',540:'spor',600:'yiyecek',660:'uzay',720:'deniz',780:'cicek',840:'teknoloji',900:'doga',960:'tatil',1020:'matematik',1080:'mutfak',1140:'sanat',1200:'tarih',1260:'cografi',1320:'moda',1380:'insaat',1440:'son',1500:'son'};
-function getTheme(lvl){const k=THEME_LEVELS[Math.ceil(lvl/60)*60]||'turk';return{key:k,...THEMES[k]};}
+const THEME_LEVELS={10:'meyve',20:'hayvan',30:'esya',40:'islami',50:'okul',60:'tasit',70:'sebze',80:'muzik',90:'spor',100:'yiyecek',110:'uzay',120:'deniz',130:'cicek',140:'teknoloji',150:'doga',160:'tatil',170:'matematik',180:'mutfak',190:'sanat',200:'tarih',210:'cografi',220:'moda',230:'insaat',240:'son',250:'son'};
+function getTheme(lvl){const k=THEME_LEVELS[lvl]||'turk';return{key:k,...THEMES[k]};}
 
 // ═══════════ MOTİFLER ═══════════
-const MOTIF_SETS={
-turk:[
+// Normal leveller için karma set: Türk motifleri + halı desenleri + Uygur/Osmanlı harfleri
+const NORMAL_SET=[
+  // ── Türk Motifleri ──
   {id:'lale',label:'Lale',bg:'#FAECE7',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="50" cy="62" rx="22" ry="28" fill="#D85A30"/><ellipse cx="32" cy="48" rx="16" ry="24" fill="#E97A50" transform="rotate(-22 32 48)"/><ellipse cx="68" cy="48" rx="16" ry="24" fill="#E97A50" transform="rotate(22 68 48)"/><ellipse cx="50" cy="42" rx="11" ry="20" fill="#BA4520"/><rect x="46" y="78" width="8" height="18" rx="4" fill="#3B6D11"/></svg>`},
+  {id:'cini',label:'Çini',bg:'#E6F1FB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="6" y="6" width="88" height="88" rx="8" fill="#EAF4FD"/><rect x="6" y="6" width="88" height="88" rx="8" fill="none" stroke="#185FA5" stroke-width="3"/><rect x="18" y="18" width="64" height="64" rx="5" fill="none" stroke="#378ADD" stroke-width="2"/><circle cx="50" cy="50" r="17" fill="none" stroke="#185FA5" stroke-width="2.5"/><circle cx="50" cy="50" r="6" fill="#185FA5"/><line x1="6" y1="50" x2="94" y2="50" stroke="#378ADD" stroke-width="1.5"/><line x1="50" y1="6" x2="50" y2="94" stroke="#378ADD" stroke-width="1.5"/></svg>`},
+  {id:'hilal',label:'Hilal',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FDF0D0"/><circle cx="50" cy="52" r="36" fill="#EF9F27"/><circle cx="65" cy="41" r="28" fill="#FDF0D0"/><polygon points="50,16 54,30 68,30 57,39 61,53 50,44 39,53 43,39 32,30 46,30" fill="#EF9F27"/></svg>`},
+  {id:'selcuk',label:'Selçuk',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><polygon points="50,6 56,30 80,30 61,46 68,70 50,56 32,70 39,46 20,30 44,30" fill="#AFA9EC"/><polygon points="50,14 55,32 74,32 59,43 64,61 50,51 36,61 41,43 26,32 45,32" fill="#7F77DD"/><polygon points="50,22 54,34 66,34 57,41 60,53 50,46 40,53 43,41 34,34 46,34" fill="#534AB7"/><circle cx="50" cy="50" r="9" fill="#EEEDFE"/></svg>`},
+  {id:'nazar',label:'Nazar',bg:'#E6F1FB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="46" fill="#185FA5"/><circle cx="50" cy="50" r="32" fill="white"/><circle cx="50" cy="50" r="20" fill="#185FA5"/><circle cx="50" cy="50" r="11" fill="#2C2C2A"/><circle cx="44" cy="44" r="5" fill="white"/></svg>`},
+  {id:'hamsa',label:'Hamsa',bg:'#E1F5EE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><path d="M50 6 L40 24 L22 18 L28 38 L18 56 L36 48 L50 66 L64 48 L82 56 L72 38 L78 18 L60 24 Z" fill="#5DCAA5" stroke="#0F6E56" stroke-width="2"/><circle cx="50" cy="36" r="16" fill="#0F6E56"/><circle cx="50" cy="36" r="8" fill="#E1F5EE"/></svg>`},
+  {id:'ebru',label:'Ebru',bg:'#FBEAF0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="50" cy="50" rx="44" ry="44" fill="#F4C0D1"/><path d="M4 50 Q18 24 32 50 Q46 76 60 50 Q74 24 88 50" fill="none" stroke="#993556" stroke-width="3.5"/><path d="M4 36 Q18 10 32 36 Q46 62 60 36 Q74 10 88 36" fill="none" stroke="#ED93B1" stroke-width="3"/></svg>`},
+  {id:'kalem',label:'Kalemiş',bg:'#E1F5EE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="40" fill="none" stroke="#1D9E75" stroke-width="3"/><path d="M50 10 Q63 27 63 50 Q63 73 50 90 Q37 73 37 50 Q37 27 50 10Z" fill="#5DCAA5"/><path d="M10 50 Q27 37 50 37 Q73 37 90 50 Q73 63 50 63 Q27 63 10 50Z" fill="#1D9E75"/><circle cx="50" cy="50" r="10" fill="#0F6E56"/></svg>`},
+  {id:'gul',label:'Gül',bg:'#FBEAF0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="32" cy="34" rx="15" ry="11" fill="#F4C0D1" transform="rotate(-30 32 34)"/><ellipse cx="68" cy="34" rx="15" ry="11" fill="#F4C0D1" transform="rotate(30 68 34)"/><ellipse cx="50" cy="20" rx="15" ry="11" fill="#F4C0D1"/><circle cx="50" cy="46" r="26" fill="#D4537E"/><circle cx="50" cy="46" r="16" fill="#993556"/><circle cx="50" cy="46" r="8" fill="#72243E"/><rect x="46" y="74" width="8" height="20" rx="4" fill="#3B6D11"/></svg>`},
+  {id:'kilim',label:'Kilim',bg:'#FBEAF0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="4" fill="#ED93B1"/><rect x="14" y="14" width="72" height="72" rx="3" fill="#993556"/><rect x="24" y="24" width="52" height="52" rx="2" fill="#ED93B1"/><rect x="34" y="34" width="32" height="32" rx="2" fill="#72243E"/><line x1="4" y1="50" x2="96" y2="50" stroke="#F4C0D1" stroke-width="2.5"/><line x1="50" y1="4" x2="50" y2="96" stroke="#F4C0D1" stroke-width="2.5"/></svg>`},
+  {id:'yildiz',label:'Yıldız',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><polygon points="50,6 56,36 86,36 63,54 72,84 50,66 28,84 37,54 14,36 44,36" fill="#AFA9EC"/><polygon points="50,14 55,38 78,38 60,51 67,75 50,62 33,75 40,51 22,38 45,38" fill="#7F77DD"/><polygon points="50,22 54,40 70,40 58,49 62,65 50,56 38,65 42,49 30,40 46,40" fill="#534AB7"/><circle cx="50" cy="50" r="10" fill="#EEEDFE"/></svg>`},
+  {id:'hat',label:'Hat',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="10" fill="#FDF4E0"/><path d="M16 60 Q26 28 50 24 Q74 20 82 42" fill="none" stroke="#412402" stroke-width="4.5" stroke-linecap="round"/><path d="M16 60 Q22 80 50 78 Q78 76 84 60" fill="none" stroke="#412402" stroke-width="4.5" stroke-linecap="round"/><circle cx="50" cy="67" r="7" fill="#412402"/></svg>`},
+  {id:'karagoz',label:'Karagöz',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="50" cy="52" rx="34" ry="38" fill="#AFA9EC"/><ellipse cx="50" cy="46" rx="24" ry="28" fill="#534AB7"/><circle cx="37" cy="40" r="10" fill="white"/><circle cx="63" cy="40" r="10" fill="white"/><circle cx="37" cy="40" r="5.5" fill="#26215C"/><circle cx="63" cy="40" r="5.5" fill="#26215C"/><path d="M37 58 Q50 72 63 58" fill="none" stroke="#26215C" stroke-width="3.5" stroke-linecap="round"/></svg>`},
+  {id:'carkifelek',label:'Çarkıfelek',bg:'#FBEAF0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="40" fill="none" stroke="#D4537E" stroke-width="2"/><path d="M50 10 Q70 30 50 50 Q30 30 50 10Z" fill="#ED93B1"/><path d="M90 50 Q70 70 50 50 Q70 30 90 50Z" fill="#D4537E"/><path d="M50 90 Q30 70 50 50 Q70 70 50 90Z" fill="#ED93B1"/><path d="M10 50 Q30 30 50 50 Q30 70 10 50Z" fill="#D4537E"/><circle cx="50" cy="50" r="10" fill="#993556"/></svg>`},
+  {id:'nar',label:'Nar',bg:'#FCEBEB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="50" cy="60" rx="34" ry="32" fill="#E24B4A"/><path d="M32 28 Q50 12 68 28" fill="none" stroke="#A32D2D" stroke-width="3.5"/><rect x="43" y="10" width="14" height="20" rx="6" fill="#3B6D11"/><ellipse cx="36" cy="53" r="6" fill="#F7C1C1"/><ellipse cx="50" cy="44" r="6" fill="#F7C1C1"/><ellipse cx="64" cy="53" r="6" fill="#F7C1C1"/><ellipse cx="50" cy="68" r="6" fill="#F7C1C1"/></svg>`},
+  {id:'konak',label:'Konak',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="14" y="50" width="72" height="44" rx="3" fill="#7F77DD"/><polygon points="50,10 10,52 90,52" fill="#534AB7"/><rect x="42" y="66" width="16" height="28" rx="2" fill="#EEEDFE"/><rect x="16" y="56" width="16" height="14" rx="2" fill="#AFA9EC"/><rect x="68" y="56" width="16" height="14" rx="2" fill="#AFA9EC"/></svg>`},
+  {id:'aslan',label:'Aslan',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="36" fill="#EF9F27"/><ellipse cx="50" cy="50" rx="24" ry="26" fill="#FAC775"/><circle cx="38" cy="44" r="7" fill="#412402"/><circle cx="62" cy="44" r="7" fill="#412402"/><path d="M36 64 Q50 76 64 64" fill="none" stroke="#BA7517" stroke-width="3.5" stroke-linecap="round"/></svg>`},
+  {id:'cami',label:'Cami',bg:'#E1F5EE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="18" y="54" width="64" height="40" rx="2" fill="#1D9E75"/><path d="M18 54 Q50 20 82 54Z" fill="#5DCAA5"/><rect x="12" y="40" width="8" height="54" rx="3" fill="#0F6E56"/><rect x="80" y="40" width="8" height="54" rx="3" fill="#0F6E56"/><rect x="42" y="68" width="16" height="26" rx="2" fill="#EBF9F2"/></svg>`},
+  {id:'deve',label:'Deve',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="54" cy="54" rx="30" ry="20" fill="#EF9F27"/><ellipse cx="34" cy="36" rx="15" ry="22" fill="#EF9F27"/><ellipse cx="42" cy="30" rx="11" ry="16" fill="#BA7517"/><rect x="22" y="68" width="11" height="26" rx="5" fill="#EF9F27"/><rect x="37" y="68" width="11" height="26" rx="5" fill="#EF9F27"/><rect x="54" y="68" width="11" height="26" rx="5" fill="#EF9F27"/><rect x="69" y="68" width="11" height="26" rx="5" fill="#EF9F27"/></svg>`},
+  {id:'semaver',label:'Semaver',bg:'#FCEBEB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="50" cy="60" rx="28" ry="28" fill="#E24B4A"/><rect x="36" y="22" width="28" height="12" rx="3" fill="#A32D2D"/><ellipse cx="50" cy="22" rx="18" ry="7" fill="#E24B4A"/><rect x="46" y="10" width="8" height="14" rx="3" fill="#A32D2D"/><rect x="20" y="56" width="12" height="7" rx="2" fill="#F09595"/><rect x="68" y="56" width="12" height="7" rx="2" fill="#F09595"/></svg>`},
+  {id:'horoz',label:'Horoz',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="50" cy="62" rx="28" ry="24" fill="#EF9F27"/><circle cx="50" cy="36" r="20" fill="#EF9F27"/><path d="M32 22 Q38 6 50 14 Q56 6 66 9 Q61 22 50 22" fill="#E24B4A"/><circle cx="43" cy="34" r="6" fill="#2C2C2A"/><circle cx="41" cy="32" r="2.5" fill="white"/></svg>`},
+  {id:'balik',label:'Balık',bg:'#E6F1FB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><ellipse cx="46" cy="50" rx="34" ry="20" fill="#378ADD"/><path d="M80 26 L98 50 L80 74 Z" fill="#185FA5"/><circle cx="30" cy="46" r="7" fill="white"/><circle cx="30" cy="46" r="4" fill="#042C53"/></svg>`},
+  {id:'kuyumcu',label:'Mücevher',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><polygon points="50,16 62,36 86,40 68,58 72,82 50,70 28,82 32,58 14,40 38,36" fill="#AFA9EC"/><polygon points="50,24 60,40 80,43 66,57 69,77 50,67 31,77 34,57 20,43 40,40" fill="#7F77DD"/><circle cx="50" cy="52" r="12" fill="#EEEDFE"/><circle cx="50" cy="52" r="7" fill="#7F77DD"/></svg>`},
+  // ── Halı Desenleri ──
+  {id:'hali1',label:'Göl Halısı',bg:'#E1F5EE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="4" fill="#1D9E75"/><rect x="12" y="12" width="76" height="76" rx="3" fill="#0F6E56"/><rect x="20" y="20" width="60" height="60" rx="2" fill="#1D9E75"/><polygon points="50,24 56,36 68,36 59,44 63,56 50,48 37,56 41,44 32,36 44,36" fill="#EF9F27"/><rect x="28" y="28" width="10" height="10" rx="1" fill="#5DCAA5"/><rect x="62" y="28" width="10" height="10" rx="1" fill="#5DCAA5"/><rect x="28" y="62" width="10" height="10" rx="1" fill="#5DCAA5"/><rect x="62" y="62" width="10" height="10" rx="1" fill="#5DCAA5"/></svg>`},
+  {id:'hali2',label:'Konya Halısı',bg:'#FAECE7',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="4" fill="#D85A30"/><rect x="10" y="10" width="80" height="80" rx="3" fill="#BA4520"/><rect x="18" y="18" width="64" height="64" rx="2" fill="#D85A30"/><rect x="26" y="26" width="48" height="48" rx="2" fill="#993C1D"/><polygon points="50,30 54,40 64,40 57,47 60,57 50,51 40,57 43,47 36,40 46,40" fill="#FAC775"/><line x1="18" y1="50" x2="82" y2="50" stroke="#E97A50" stroke-width="1.5"/><line x1="50" y1="18" x2="50" y2="82" stroke="#E97A50" stroke-width="1.5"/></svg>`},
+  {id:'hali3',label:'Hereke Halısı',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="4" fill="#534AB7"/><rect x="10" y="10" width="80" height="80" rx="3" fill="#3C3489"/><rect x="18" y="18" width="64" height="64" rx="2" fill="#534AB7"/><circle cx="50" cy="50" r="22" fill="none" stroke="#AFA9EC" stroke-width="2"/><circle cx="50" cy="50" r="14" fill="none" stroke="#7F77DD" stroke-width="1.5"/><circle cx="50" cy="50" r="6" fill="#AFA9EC"/><line x1="28" y1="28" x2="72" y2="72" stroke="#7F77DD" stroke-width="1"/><line x1="72" y1="28" x2="28" y2="72" stroke="#7F77DD" stroke-width="1"/><circle cx="28" cy="28" r="4" fill="#AFA9EC"/><circle cx="72" cy="28" r="4" fill="#AFA9EC"/><circle cx="28" cy="72" r="4" fill="#AFA9EC"/><circle cx="72" cy="72" r="4" fill="#AFA9EC"/></svg>`},
+  {id:'hali4',label:'Uşak Halısı',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="4" fill="#EF9F27"/><rect x="10" y="10" width="80" height="80" rx="3" fill="#BA7517"/><rect x="18" y="18" width="64" height="64" rx="2" fill="#EF9F27"/><ellipse cx="50" cy="50" rx="20" ry="28" fill="#BA7517"/><ellipse cx="50" cy="50" rx="14" ry="20" fill="#EF9F27"/><ellipse cx="50" cy="50" rx="8" ry="12" fill="#BA7517"/><line x1="18" y1="18" x2="82" y2="82" stroke="#FAC775" stroke-width="1.5"/><line x1="82" y1="18" x2="18" y2="82" stroke="#FAC775" stroke-width="1.5"/></svg>`},
+  {id:'hali5',label:'Bergama Halısı',bg:'#FCEBEB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="4" fill="#E24B4A"/><rect x="10" y="10" width="80" height="80" rx="3" fill="#A32D2D"/><rect x="18" y="18" width="64" height="64" rx="2" fill="#E24B4A"/><rect x="34" y="34" width="32" height="32" rx="2" fill="#A32D2D"/><polygon points="50,26 54,34 62,34 56,40 58,48 50,44 42,48 44,40 38,34 46,34" fill="#F7C1C1"/><polygon points="50,52 54,60 62,60 56,66 58,74 50,70 42,74 44,66 38,60 46,60" fill="#F7C1C1"/></svg>`},
+  // ── Uygur / Osmanlı Harfleri ──
+  {id:'ugr_elif',label:'Elif (ا)',bg:'#FDF4E0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FDF4E0"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#BA7517" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="62" fill="#412402" font-family="serif">ا</text></svg>`},
+  {id:'ugr_be',label:'Be (ب)',bg:'#EAF4FD',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#EAF4FD"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#185FA5" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#0C447C" font-family="serif">ب</text></svg>`},
+  {id:'ugr_te',label:'Te (ت)',bg:'#EBF9F2',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#EBF9F2"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#0F6E56" font-family="serif">ت</text></svg>`},
+  {id:'ugr_jim',label:'Cim (ج)',bg:'#FEF2F2',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FEF2F2"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#E24B4A" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#A32D2D" font-family="serif">ج</text></svg>`},
+  {id:'ugr_dal',label:'Dal (د)',bg:'#F0EFFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#F0EFFE"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#534AB7" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="62" fill="#26215C" font-family="serif">د</text></svg>`},
+  {id:'ugr_re',label:'Re (ر)',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FAEEDA"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#EF9F27" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="62" fill="#633806" font-family="serif">ر</text></svg>`},
+  {id:'ugr_sin',label:'Sin (س)',bg:'#EAF3DE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#EAF3DE"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#639922" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="52" fill="#27500A" font-family="serif">س</text></svg>`},
+  {id:'ugr_ayn',label:"Ayn (ع)",bg:'#FBEAF0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FBEAF0"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#D4537E" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#72243E" font-family="serif">ع</text></svg>`},
+  {id:'ugr_kaf',label:'Kaf (ك)',bg:'#EAF4FD',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#EAF4FD"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#378ADD" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#042C53" font-family="serif">ك</text></svg>`},
+  {id:'ugr_mim',label:'Mim (م)',bg:'#FEF2F2',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FEF2F2"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#E24B4A" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#791F1F" font-family="serif">م</text></svg>`},
+  {id:'ugr_nun',label:'Nun (ن)',bg:'#F0EFFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#F0EFFE"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#7F77DD" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#26215C" font-family="serif">ن</text></svg>`},
+  {id:'ugr_vav',label:'Vav (و)',bg:'#EBF9F2',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#EBF9F2"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#1D9E75" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="62" fill="#04342C" font-family="serif">و</text></svg>`},
+  {id:'ugr_ya',label:'Ya (ي)',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FAEEDA"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#BA7517" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="52" fill="#412402" font-family="serif">ي</text></svg>`},
+  {id:'ugr_lam',label:'Lam (ل)',bg:'#EAF3DE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#EAF3DE"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#639922" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="62" fill="#173404" font-family="serif">ل</text></svg>`},
+  {id:'ugr_ha',label:'Ha (ه)',bg:'#F6F5F0',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#F6F5F0"/><rect x="4" y="4" width="92" height="92" rx="8" fill="none" stroke="#888780" stroke-width="2"/><text x="50" y="68" text-anchor="middle" font-size="58" fill="#2C2C2A" font-family="serif">ه</text></svg>`},
+];
+
+const MOTIF_SETS={
+turk:NORMAL_SET,
   {id:'cini',label:'Çini',bg:'#E6F1FB',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="6" y="6" width="88" height="88" rx="8" fill="#EAF4FD"/><rect x="6" y="6" width="88" height="88" rx="8" fill="none" stroke="#185FA5" stroke-width="3"/><rect x="18" y="18" width="64" height="64" rx="5" fill="none" stroke="#378ADD" stroke-width="2"/><circle cx="50" cy="50" r="17" fill="none" stroke="#185FA5" stroke-width="2.5"/><circle cx="50" cy="50" r="6" fill="#185FA5"/><line x1="6" y1="50" x2="94" y2="50" stroke="#378ADD" stroke-width="1.5"/><line x1="50" y1="6" x2="50" y2="94" stroke="#378ADD" stroke-width="1.5"/></svg>`},
   {id:'hilal',label:'Hilal',bg:'#FAEEDA',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><rect x="4" y="4" width="92" height="92" rx="8" fill="#FDF0D0"/><circle cx="50" cy="52" r="36" fill="#EF9F27"/><circle cx="65" cy="41" r="28" fill="#FDF0D0"/><polygon points="50,16 54,30 68,30 57,39 61,53 50,44 39,53 43,39 32,30 46,30" fill="#EF9F27"/></svg>`},
   {id:'selcuk',label:'Selçuk',bg:'#EEEDFE',svg:`<svg viewBox="0 0 100 100" width="100%" height="100%"><polygon points="50,6 56,30 80,30 61,46 68,70 50,56 32,70 39,46 20,30 44,30" fill="#AFA9EC"/><polygon points="50,14 55,32 74,32 59,43 64,61 50,51 36,61 41,43 26,32 45,32" fill="#7F77DD"/><polygon points="50,22 54,34 66,34 57,41 60,53 50,46 40,53 43,41 34,34 46,34" fill="#534AB7"/><circle cx="50" cy="50" r="9" fill="#EEEDFE"/></svg>`},
@@ -253,17 +287,17 @@ Object.keys(THEMES).forEach(k=>{if(!MOTIF_SETS[k])MOTIF_SETS[k]=MOTIF_SETS.turk;
 // ═══════════ LEVEL KONFİG ═══════════
 function getLevelConfig(lvl){
   let cols,rows,pairs,hints,layers;
-  if(lvl<=3){cols=2;rows=2;pairs=2;layers=1;}
-  else if(lvl<=8){cols=4;rows=2;pairs=4;layers=1;}
-  else if(lvl<=20){cols=4;rows=4;pairs=8;layers=1;}
-  else if(lvl<=60){cols=4;rows=4;pairs=8;layers=2;}
-  else if(lvl<=150){cols=5;rows=4;pairs=10;layers=2;}
-  else if(lvl<=300){cols=6;rows=4;pairs=12;layers=3;}
-  else if(lvl<=500){cols=6;rows=6;pairs=18;layers=3;}
-  else if(lvl<=750){cols=8;rows=4;pairs=16;layers=3;}
-  else if(lvl<=1100){cols=8;rows=6;pairs=24;layers=4;}
-  else{cols=10;rows=5;pairs=25;layers=5;}
-  if(lvl<=3)hints=0;else if(lvl<=20)hints=3;else if(lvl<=150)hints=2;else hints=3;
+  if(lvl<=10){cols=2;rows=2;pairs=2;layers=1;}
+  else if(lvl<=25){cols=4;rows=2;pairs=4;layers=1;}
+  else if(lvl<=34){cols=4;rows=4;pairs=8;layers=1;}
+  else if(lvl<=80){cols=4;rows=4;pairs=8;layers=2;}
+  else if(lvl<=110){cols=5;rows=4;pairs=10;layers=2;}
+  else if(lvl<=140){cols=6;rows=4;pairs=12;layers=3;}
+  else if(lvl<=170){cols=6;rows=6;pairs=18;layers=3;}
+  else if(lvl<=200){cols=8;rows=4;pairs=16;layers=3;}
+  else if(lvl<=225){cols=8;rows=6;pairs=24;layers=4;}
+  else{cols=10;rows=5;pairs=25;layers=4;}
+  if(lvl<=5)hints=0;else if(lvl<=30)hints=3;else if(lvl<=80)hints=2;else hints=3;
   return{cols,rows,pairs,hints,layers};
 }
 
@@ -279,15 +313,15 @@ function showMenu(){
   document.getElementById('game-screen').style.display='none';
   const el=document.getElementById('menu-screen');
   el.style.display='block';
-  const pct=Math.round(sv.done.length/1500*100);
-  const tiers=[[1,60],[61,120],[121,180],[181,240],[241,300],[301,360],[361,420],[421,480],[481,540],[541,600],[601,660],[661,720],[721,780],[781,840],[841,900],[901,960],[961,1020],[1021,1080],[1081,1140],[1141,1200],[1201,1260],[1261,1320],[1321,1380],[1381,1440],[1441,1500]];
-  let h=`<div class="menu-header"><div class="logo">🕌</div><h1>Türk Motifleri Memory</h1><p>1500 Level · Offline · Tema Sistemi</p></div>
-  <div class="progress-bar-wrap"><span class="pb-label">İlerleme</span><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div><span class="pb-count">${sv.done.length}/1500</span></div>`;
+  const pct=Math.round(sv.done.length/250*100);
+  const tiers=[[1,10],[11,25],[26,50],[51,80],[81,110],[111,140],[141,170],[171,200],[201,225],[226,250]];
+  let h=`<div class="menu-header"><div class="logo">🕌</div><h1>Türk Motifleri Memory</h1><p>250 Level · Offline · Tema Sistemi</p></div>
+  <div class="progress-bar-wrap"><span class="pb-label">İlerleme</span><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div><span class="pb-count">${sv.done.length}/250</span></div>`;
   tiers.forEach(([s,e])=>{
     h+=`<div class="tier-section"><div class="tier-label">${s}–${e}. Levellar</div><div class="level-grid">`;
     for(let l=s;l<=e;l++){
       const done=sv.done.includes(l),unlocked=l<=sv.max,isCur=l===sv.max&&!done;
-      const th=getTheme(l),isSpecial=l%60===0;
+      const th=getTheme(l),isSpecial=l%10===0;
       let c='lvl-btn';
       if(done)c+=' completed';else if(isCur)c+=' current unlocked';else if(unlocked)c+=' unlocked';else c+=' locked';
       if(isSpecial&&unlocked)c+=' special';
@@ -302,7 +336,7 @@ function showMenu(){
 // ═══════════ LEVEL BAŞLAT ═══════════
 function startLevel(lvl){
   const th=getTheme(lvl);
-  if(lvl%60===0){showIntro(lvl,th);}else{playLevel(lvl,th);}
+  if(lvl%10===0){showIntro(lvl,th);}else{playLevel(lvl,th);}
 }
 
 function showIntro(lvl,th){
@@ -323,7 +357,7 @@ function showIntro(lvl,th){
 function playLevel(lvl,th){
   if(!th)th=getTheme(lvl);
   const cfg=getLevelConfig(lvl);
-  const pool=MOTIF_SETS[th.key]||MOTIF_SETS.turk;
+  const pool=(lvl%10===0)?(MOTIF_SETS[th.key]||NORMAL_SET):NORMAL_SET;
   const shuffled=[...pool].sort(()=>Math.random()-.5).slice(0,cfg.pairs);
   const totalSlots=cfg.cols*cfg.rows;
   let allCards=[];
@@ -345,10 +379,14 @@ function renderGame(){
   el.style.display='block';
   const gap=g.cfg.cols>=8?3:g.cfg.cols>=6?4:5;
   const layPips=g.cfg.layers>1?`<div class="layer-dots">${Array(g.cfg.layers).fill(0).map((_,i)=>`<div class="ld${i===g.cfg.layers-1?' active':''}" id="lp${i}"></div>`).join('')}</div>`:'';
+  const isSpecialLvl=g.lvl%10===0;
+  const themeLabel=isSpecialLvl?`${g.th.icon} ${g.th.name}`:'🕌 Türk & Halı & Uygur';
+  const themeBg=isSpecialLvl?g.th.bg:'#EEEDFE';
+  const themeColor=isSpecialLvl?g.th.color:'#534AB7';
   el.innerHTML=`<div class="game-wrap anim-in">
     <div class="topbar">
       <button class="tb-btn" onclick="showMenu()">← Menü</button>
-      <div class="tb-theme" style="background:${g.th.bg};color:${g.th.color};">${g.th.icon} ${g.th.name}</div>
+      <div class="tb-theme" style="background:${themeBg};color:${themeColor};">${themeLabel}</div>
       ${layPips}
       <div class="tb-stat">Hamle <b id="mv">0</b></div>
       <div class="tb-stat"><b id="mc">0</b>/${g.totalPairs}</div>
@@ -360,68 +398,32 @@ function renderGame(){
   buildSlots();
 }
 
-// Per-layer card front configs
-const LAYER_FRONTS=[
-  // Layer 0 (top) — deep purple 3D
-  {grad:'linear-gradient(135deg,#7b74e0 0%,#534AB7 45%,#3529a0 100%)',
-   shine:'radial-gradient(ellipse at 38% 28%,rgba(255,255,255,0.28) 0%,transparent 58%)',
-   border:'rgba(255,255,255,0.28)',shadow:'rgba(83,74,183,0.45)',icon:'✦',iconColor:'rgba(255,255,255,0.32)'},
-  // Layer 1 — bronze/copper
-  {grad:'linear-gradient(135deg,#c98a3a 0%,#a06520 45%,#7a4a10 100%)',
-   shine:'radial-gradient(ellipse at 38% 28%,rgba(255,220,120,0.3) 0%,transparent 58%)',
-   border:'rgba(255,200,80,0.35)',shadow:'rgba(120,80,20,0.45)',icon:'◈',iconColor:'rgba(255,210,100,0.4)'},
-  // Layer 2 — dark teal/emerald
-  {grad:'linear-gradient(135deg,#2dab88 0%,#0f6e56 45%,#09503d 100%)',
-   shine:'radial-gradient(ellipse at 38% 28%,rgba(120,255,200,0.22) 0%,transparent 58%)',
-   border:'rgba(80,220,170,0.3)',shadow:'rgba(10,80,60,0.45)',icon:'❋',iconColor:'rgba(100,240,190,0.38)'},
-  // Layer 3 — crimson/ruby
-  {grad:'linear-gradient(135deg,#d44a4a 0%,#a32d2d 45%,#7a1a1a 100%)',
-   shine:'radial-gradient(ellipse at 38% 28%,rgba(255,150,150,0.25) 0%,transparent 58%)',
-   border:'rgba(255,120,120,0.3)',shadow:'rgba(120,20,20,0.45)',icon:'✺',iconColor:'rgba(255,160,160,0.38)'},
-  // Layer 4 — midnight/obsidian
-  {grad:'linear-gradient(135deg,#4a4a6a 0%,#26215c 45%,#141030 100%)',
-   shine:'radial-gradient(ellipse at 38% 28%,rgba(180,160,255,0.25) 0%,transparent 58%)',
-   border:'rgba(160,140,255,0.3)',shadow:'rgba(20,16,50,0.5)',icon:'⬡',iconColor:'rgba(180,160,255,0.4)'},
-];
-function layerFront(li){return LAYER_FRONTS[Math.min(li,LAYER_FRONTS.length-1)];}
-
-function makeCardEl(card, li, totalLayers, si, isTop, isFlipped){
-  const lf = layerFront(li);
-  const w = document.createElement('div');
-  w.className = `card-wrap${!isTop ? ' locked-card' : ''}`;
-  w.dataset.si = si; w.dataset.uid = card.uid; w.dataset.li = li;
-  // No translate offset — keeps hit area aligned with visual
-  w.style.cssText = `position:absolute;width:100%;height:100%;z-index:${(li+1)*10};`;
-  // Depth illusion via shadow intensity based on layer
-  const depthShadow = li > 0 ? `0 ${li*3}px ${li*6}px rgba(0,0,0,0.${2+li*8})` : '';
-  w.innerHTML = `<div class="card-inner">
-    <div class="c-front" style="
-      background:${lf.grad};
-      border:1.5px solid ${lf.border};
-      box-shadow:inset 0 1px 0 rgba(255,255,255,0.3),inset 0 -1px 0 rgba(0,0,0,0.25),0 4px 14px ${lf.shadow}${depthShadow?','+depthShadow:''};
-      position:relative;
-    ">
-      <div style="position:absolute;inset:0;border-radius:10px;background:${lf.shine};pointer-events:none;"></div>
-      <span style="position:absolute;font-size:clamp(10px,2.5vw,20px);color:${lf.iconColor};text-shadow:0 0 8px ${lf.iconColor};">${lf.icon}</span>
-    </div>
-    <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
-  </div>`;
-  if(isTop) w.addEventListener('click', () => flipAny(si, card.uid, li, w));
-  return w;
-}
-
 function buildSlots(){
-  const g=gs, cg=document.getElementById('cg');
+  const g=gs,cg=document.getElementById('cg');
   cg.innerHTML='';
   g.slots.forEach((stack,si)=>{
     const slot=document.createElement('div');
     slot.className='card-slot';
     const se=document.createElement('div');
     se.className='card-stack';
-    const topLi = stack.length-1;
     stack.forEach((card,li)=>{
-      const isTop = li===topLi;
-      const w = makeCardEl(card, li, stack.length, si, isTop, false);
+      const isTop=li===stack.length-1;
+      const ox=li*-3,oy=li*-4;
+      const w=document.createElement('div');
+      w.className=`card-wrap${!isTop?' locked-card':''}`;
+      w.dataset.si=si;w.dataset.uid=card.uid;
+      w.style.cssText=`position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
+      w.innerHTML=`<div class="card-inner">
+        <div class="c-front" style="border:1.5px solid ${!isTop?'#c8c5bc;border-style:dashed;opacity:.65':'#c8c5bc'};">
+          <svg viewBox="0 0 100 100" width="50%" height="50%">
+            <rect x="8" y="8" width="84" height="84" rx="9" fill="none" stroke="#c8c5bc" stroke-width="5"/>
+            <path d="M8 8 L92 92 M92 8 L8 92" stroke="#e0ddd6" stroke-width="4"/>
+            ${isTop?`<circle cx="50" cy="50" r="16" fill="none" stroke="#c8c5bc" stroke-width="4"/>`:`<text x="50" y="58" text-anchor="middle" font-size="26" fill="#c8c5bc">🔒</text>`}
+          </svg>
+        </div>
+        <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
+      </div>`;
+      if(isTop)w.addEventListener('click',()=>flip(si,card.uid,w));
       se.appendChild(w);
     });
     slot.appendChild(se);
@@ -431,14 +433,12 @@ function buildSlots(){
 
 function getTop(si){const s=gs.slots[si];return s&&s.length?s[s.length-1]:null;}
 
-function flipAny(si,uid,li,el){
+function flip(si,uid,el){
   const g=gs;
   if(g.lock||el.classList.contains('flipped'))return;
-  const stack=g.slots[si];
-  const card=stack[li];
-  if(!card||card.uid!==uid)return;
+  const card=getTop(si);if(!card||card.uid!==uid)return;
   el.classList.add('flipped');el.classList.remove('hint-glow');
-  g.flipped.push({si,uid,li,el,card});
+  g.flipped.push({si,uid,el,card});
   if(g.flipped.length===2){
     g.lock=true;g.moves++;
     document.getElementById('mv').textContent=g.moves;
@@ -453,9 +453,9 @@ function flipAny(si,uid,li,el){
           rebSlot(a.si);rebSlot(b.si);
           g.flipped=[];g.lock=false;
           if(g.matched===g.totalPairs)setTimeout(showWin,350);
-          else setMsg(g.cfg.layers>1?'Kartları eşleştir!':'Kartları eşleştir!','');
+          else setMsg(g.cfg.layers>1?'Üstteki kartları önce eşleştir!':'Kartları eşleştir!','');
         },360);
-      },500);
+      },100);
     } else {
       setMsg('Eşleşmedi!','no');
       setTimeout(()=>{
@@ -463,7 +463,7 @@ function flipAny(si,uid,li,el){
         setTimeout(()=>{
           a.el.classList.remove('flipped','shaking');b.el.classList.remove('flipped','shaking');
           g.flipped=[];g.lock=false;
-          setMsg(g.cfg.layers>1?'Kartları eşleştir!':'Kartları eşleştir!','');
+          setMsg(g.cfg.layers>1?'Üstteki kartları önce eşleştir!':'Kartları eşleştir!','');
         },380);
       },150);
     }
@@ -476,11 +476,25 @@ function rebSlot(si){
   const slotEl=cg.querySelectorAll('.card-slot')[si];if(!slotEl)return;
   const se=slotEl.querySelector('.card-stack');se.innerHTML='';
   const stack=gs.slots[si];
-  const topLi=stack.length-1;
   stack.forEach((card,li)=>{
-    const isTop=li===topLi;
-    const w=makeCardEl(card,li,stack.length,si,isTop,false);
+    const isTop=li===stack.length-1;
+    const ox=li*-3,oy=li*-4;
+    const w=document.createElement('div');
+    w.className=`card-wrap${!isTop?' locked-card':''}`;
+    w.dataset.si=si;w.dataset.uid=card.uid;
+    w.style.cssText=`position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
     if(isTop&&stack.length<gs.cfg.layers)w.classList.add('layer-reveal');
+    w.innerHTML=`<div class="card-inner">
+      <div class="c-front" style="border:1.5px solid ${!isTop?'#c8c5bc;border-style:dashed;opacity:.65':'#c8c5bc'};">
+        <svg viewBox="0 0 100 100" width="50%" height="50%">
+          <rect x="8" y="8" width="84" height="84" rx="9" fill="none" stroke="#c8c5bc" stroke-width="5"/>
+          <path d="M8 8 L92 92 M92 8 L8 92" stroke="#e0ddd6" stroke-width="4"/>
+          ${isTop?`<circle cx="50" cy="50" r="16" fill="none" stroke="#c8c5bc" stroke-width="4"/>`:`<text x="50" y="58" text-anchor="middle" font-size="26" fill="#c8c5bc">🔒</text>`}
+        </svg>
+      </div>
+      <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
+    </div>`;
+    if(isTop)w.addEventListener('click',()=>flip(si,card.uid,w));
     se.appendChild(w);
   });
 }
@@ -517,14 +531,14 @@ function showWin(){
   if(g.lvl>=sv.max)sv.max=g.lvl+1;
   saveSv(sv);
   const stars=g.moves<=g.totalPairs+3?3:g.moves<=g.totalPairs*2?2:1;
-  const isLast=g.lvl===1500;
+  const isLast=g.lvl===250;
   const nextTh=!isLast?getTheme(g.lvl+1):null;
   document.getElementById('game-screen').innerHTML=`<div class="screen anim-in"><div class="win-screen">
     <div class="confetti-container" id="cc"></div>
     <div style="font-size:30px;margin-bottom:.3rem">${'⭐'.repeat(stars)}</div>
     <div style="font-size:26px;margin-bottom:.3rem">${g.th.icon}</div>
     <h2>Seviye ${g.lvl} Tamamlandı!</h2>
-    <p>${isLast?'Tüm 1500 seviyeyi bitirdin! Türk Hafıza Grandmasterisin!':(!isLast&&(g.lvl+1)%60===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
+    <p>${isLast?'Tüm 250 seviyeyi bitirdin! Türk Hafıza Ustasısın!':(!isLast&&(g.lvl+1)%10===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
     <div class="win-stats">
       <div class="wst"><div class="wl">Hamle</div><div class="wv">${g.moves}</div></div>
       <div class="wst"><div class="wl">Çift</div><div class="wv">${g.matched}</div></div>
