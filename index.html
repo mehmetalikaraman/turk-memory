@@ -80,7 +80,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:#f8f7f4;font-famil
 @keyframes reveal{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
 .layer-reveal{animation:reveal .3s ease;}
 .c-front,.c-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.c-front{background:var(--card2);border:1.5px solid var(--border);}
+.c-front{background:transparent;border:none;}
 .c-back{transform:rotateY(180deg);padding:2px;}
 .card-wrap.matched .c-back{border:2px solid #639922 !important;background:#EAF3DE !important;border-radius:9px;}
 
@@ -398,6 +398,77 @@ function renderGame(){
   buildSlots();
 }
 
+function cardFrontSVG(cols,isTop){
+  const sm=cols>=8,md=cols>=5&&cols<8;
+  const str=sm?20:md?24:28;
+  const r1=sm?.9:md?1.1:1.4,r2=sm?.6:md?.8:1;
+  const cc=sm?5:md?6:8,ci=sm?2.5:md?3:4;
+  if(!isTop){
+    return `<svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="100" height="100" rx="10" fill="#0B2550"/>
+      <rect x="3" y="3" width="94" height="94" rx="8" fill="none" stroke="#C9A84C" stroke-width="${r1}" opacity=".5" stroke-dasharray="4 3"/>
+      <rect x="7" y="7" width="86" height="86" rx="6" fill="none" stroke="#C9A84C" stroke-width="${r2}" opacity=".3"/>
+      <text x="50" y="58" text-anchor="middle" font-size="${sm?22:26}" fill="#C9A84C" opacity=".5" font-family="sans-serif">🔒</text>
+      <rect x="0" y="0" width="100" height="50" rx="10" fill="white" opacity=".03"/>
+    </svg>`;
+  }
+  const corners=!sm?`
+    <circle cx="14" cy="14" r="${md?5:6.5}" fill="none" stroke="#C9A84C" stroke-width="${md?.9:1.1}"/>
+    <circle cx="14" cy="14" r="${md?2:2.8}" fill="#C9A84C"/>
+    <line x1="14" y1="${md?8:7}" x2="14" y2="${md?20:21}" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <line x1="${md?8:7}" y1="14" x2="${md?20:21}" y2="14" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <circle cx="86" cy="14" r="${md?5:6.5}" fill="none" stroke="#C9A84C" stroke-width="${md?.9:1.1}"/>
+    <circle cx="86" cy="14" r="${md?2:2.8}" fill="#C9A84C"/>
+    <line x1="86" y1="${md?8:7}" x2="86" y2="${md?20:21}" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <line x1="${md?80:79}" y1="14" x2="${md?92:93}" y2="14" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <circle cx="14" cy="86" r="${md?5:6.5}" fill="none" stroke="#C9A84C" stroke-width="${md?.9:1.1}"/>
+    <circle cx="14" cy="86" r="${md?2:2.8}" fill="#C9A84C"/>
+    <line x1="14" y1="${md?80:79}" x2="14" y2="${md?92:93}" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <line x1="${md?8:7}" y1="86" x2="${md?20:21}" y2="86" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <circle cx="86" cy="86" r="${md?5:6.5}" fill="none" stroke="#C9A84C" stroke-width="${md?.9:1.1}"/>
+    <circle cx="86" cy="86" r="${md?2:2.8}" fill="#C9A84C"/>
+    <line x1="86" y1="${md?80:79}" x2="86" y2="${md?92:93}" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+    <line x1="${md?80:79}" y1="86" x2="${md?92:93}" y2="86" stroke="#C9A84C" stroke-width="${md?.7:.9}"/>
+  `:'';
+  const accents=!sm?`
+    <polygon points="50,${md?11:9} 51.6,${md?16:14} 56.5,${md?16:14} 52.6,${md?19:17} 54.2,${md?24:22} 50,${md?21:19} 45.8,${md?24:22} 47.4,${md?19:17} 43.5,${md?16:14} 48.4,${md?16:14}" fill="#C9A84C" opacity=".55"/>
+    <polygon points="50,${md?89:91} 51.6,${md?84:86} 56.5,${md?84:86} 52.6,${md?81:83} 54.2,${md?76:78} 50,${md?79:81} 45.8,${md?76:78} 47.4,${md?81:83} 43.5,${md?84:86} 48.4,${md?84:86}" fill="#C9A84C" opacity=".55"/>
+  `:'';
+  return `<svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="wd" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" fill="#0B2550"/>
+        <line x1="0" y1="1" x2="6" y2="1" stroke="#0E3070" stroke-width=".9" opacity=".65"/>
+        <line x1="0" y1="3" x2="6" y2="3" stroke="#09204A" stroke-width=".6" opacity=".45"/>
+        <line x1="0" y1="5" x2="6" y2="5" stroke="#0E3070" stroke-width=".7" opacity=".55"/>
+      </pattern>
+      <pattern id="gr" x="0" y="0" width="18" height="55" patternUnits="userSpaceOnUse">
+        <ellipse cx="4" cy="18" rx="2.5" ry="20" fill="#0F3A8A" opacity=".13"/>
+        <ellipse cx="11" cy="32" rx="2" ry="24" fill="#09204A" opacity=".1"/>
+        <ellipse cx="16" cy="8" rx="1.5" ry="13" fill="#0F3A8A" opacity=".09"/>
+      </pattern>
+    </defs>
+    <rect x="0" y="0" width="100" height="100" rx="10" fill="url(#wd)"/>
+    <rect x="0" y="0" width="100" height="100" rx="10" fill="url(#gr)"/>
+    <rect x="3" y="3" width="94" height="94" rx="8" fill="none" stroke="#C9A84C" stroke-width="${r1}"/>
+    <rect x="7" y="7" width="86" height="86" rx="6" fill="none" stroke="#C9A84C" stroke-width="${r2}" opacity=".55"/>
+    ${corners}
+    <g transform="translate(50,50)">
+      <polygon points="0,-${str} ${str*.707},-${str*.707} ${str},0 ${str*.707},${str*.707} 0,${str} -${str*.707},${str*.707} -${str},0 -${str*.707},-${str*.707}"
+        fill="none" stroke="#C9A84C" stroke-width="${r1}" opacity=".65"/>
+      <polygon points="0,-${str} ${str*.22},-${str*.22} ${str},0 ${str*.22},${str*.22} 0,${str} -${str*.22},${str*.22} -${str},0 -${str*.22},-${str*.22}"
+        fill="#C9A84C" opacity=".82"/>
+      <rect x="${-str*.52}" y="${-str*.52}" width="${str*1.04}" height="${str*1.04}" fill="none" stroke="#E8C96A" stroke-width="${r2}"/>
+      <rect x="${-str*.52}" y="${-str*.52}" width="${str*1.04}" height="${str*1.04}" fill="none" stroke="#E8C96A" stroke-width="${r2}" transform="rotate(45)"/>
+      <circle r="${cc}" fill="#0B2550" stroke="#C9A84C" stroke-width="${r1}"/>
+      <circle r="${ci}" fill="#C9A84C"/>
+    </g>
+    ${accents}
+    <rect x="0" y="0" width="100" height="52" rx="10" fill="white" opacity=".04"/>
+    <rect x="0" y="0" width="52" height="100" fill="white" opacity=".015"/>
+  </svg>`;
+}
+
 function buildSlots(){
   const g=gs,cg=document.getElementById('cg');
   cg.innerHTML='';
@@ -414,13 +485,7 @@ function buildSlots(){
       w.dataset.si=si;w.dataset.uid=card.uid;
       w.style.cssText=`position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
       w.innerHTML=`<div class="card-inner">
-        <div class="c-front" style="border:1.5px solid ${!isTop?'#c8c5bc;border-style:dashed;opacity:.65':'#c8c5bc'};">
-          <svg viewBox="0 0 100 100" width="50%" height="50%">
-            <rect x="8" y="8" width="84" height="84" rx="9" fill="none" stroke="#c8c5bc" stroke-width="5"/>
-            <path d="M8 8 L92 92 M92 8 L8 92" stroke="#e0ddd6" stroke-width="4"/>
-            ${isTop?`<circle cx="50" cy="50" r="16" fill="none" stroke="#c8c5bc" stroke-width="4"/>`:`<text x="50" y="58" text-anchor="middle" font-size="26" fill="#c8c5bc">🔒</text>`}
-          </svg>
-        </div>
+        <div class="c-front">${cardFrontSVG(g.cfg.cols,isTop)}</div>
         <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
       </div>`;
       if(isTop)w.addEventListener('click',()=>flip(si,card.uid,w));
@@ -485,13 +550,7 @@ function rebSlot(si){
     w.style.cssText=`position:absolute;width:100%;height:100%;transform:translate(${ox}px,${oy}px);z-index:${(li+1)*10};`;
     if(isTop&&stack.length<gs.cfg.layers)w.classList.add('layer-reveal');
     w.innerHTML=`<div class="card-inner">
-      <div class="c-front" style="border:1.5px solid ${!isTop?'#c8c5bc;border-style:dashed;opacity:.65':'#c8c5bc'};">
-        <svg viewBox="0 0 100 100" width="50%" height="50%">
-          <rect x="8" y="8" width="84" height="84" rx="9" fill="none" stroke="#c8c5bc" stroke-width="5"/>
-          <path d="M8 8 L92 92 M92 8 L8 92" stroke="#e0ddd6" stroke-width="4"/>
-          ${isTop?`<circle cx="50" cy="50" r="16" fill="none" stroke="#c8c5bc" stroke-width="4"/>`:`<text x="50" y="58" text-anchor="middle" font-size="26" fill="#c8c5bc">🔒</text>`}
-        </svg>
-      </div>
+      <div class="c-front">${cardFrontSVG(gs.cfg.cols,isTop)}</div>
       <div class="c-back" style="background:${card.bg};border:1.5px solid ${card.bg};">${card.svg}</div>
     </div>`;
     if(isTop)w.addEventListener('click',()=>flip(si,card.uid,w));
