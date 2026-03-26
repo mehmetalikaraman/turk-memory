@@ -72,7 +72,7 @@ html,body{width:100%;height:100%;overflow-x:hidden;background:#f8f7f4;font-famil
 .card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .36s cubic-bezier(.4,0,.2,1);}
 .card-wrap.flipped .card-inner,.card-wrap.matched .card-inner{transform:rotateY(180deg);}
 @keyframes vanish{0%{transform:rotateY(180deg) scale(1);opacity:1;}50%{transform:rotateY(180deg) scale(1.16);opacity:1;}100%{transform:rotateY(180deg) scale(0);opacity:0;}}
-.card-wrap.vanishing .card-inner{animation:vanish .36s ease forwards;}
+.card-wrap.vanishing .card-inner{animation:vanish .45s ease forwards;}
 @keyframes shake{0%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}100%{transform:translateX(0);}}
 .card-wrap.shaking{animation:shake .38s ease;}
 @keyframes hintPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
@@ -141,8 +141,16 @@ const THEMES={
   insaat:{name:'İnşaat',icon:'🏗️',color:'#5F5E5A',bg:'#F1EFE8'},
   son:{name:'Ustalık Finali',icon:'🏆',color:'#412402',bg:'#FAEEDA'},
 };
-const THEME_LEVELS={10:'meyve',20:'hayvan',30:'esya',40:'islami',50:'okul',60:'tasit',70:'sebze',80:'muzik',90:'spor',100:'yiyecek',110:'uzay',120:'deniz',130:'cicek',140:'teknoloji',150:'doga',160:'tatil',170:'matematik',180:'mutfak',190:'sanat',200:'tarih',210:'cografi',220:'moda',230:'insaat',240:'son',250:'son'};
-function getTheme(lvl){const k=THEME_LEVELS[lvl]||'turk';return{key:k,...THEMES[k]};}
+const THEME_KEYS=['meyve','hayvan','esya','islami','okul','tasit','sebze','muzik','spor','yiyecek','uzay','deniz','cicek','teknoloji','doga','tatil','matematik','mutfak','sanat','tarih','cografi','moda','insaat','son','meyve','hayvan','esya','islami','okul','tasit','sebze','muzik','spor','yiyecek','uzay','deniz','cicek','teknoloji','doga','tatil','matematik','mutfak','sanat','tarih','cografi','moda','insaat','son','meyve','hayvan','esya','islami','okul','tasit','sebze','muzik','spor','yiyecek','uzay','deniz','cicek','teknoloji','doga','tatil','matematik','mutfak','sanat','tarih','cografi','moda','insaat','son','meyve','hayvan','esya','islami','okul','tasit','sebze','muzik','spor','yiyecek','uzay','deniz','cicek','teknoloji','doga','tatil','matematik','mutfak','sanat','tarih','cografi','moda','insaat','son','meyve','hayvan','esya','islami','okul','tasit','sebze','muzik','spor','yiyecek','uzay','deniz','cicek','teknoloji','doga','tatil','matematik','mutfak','sanat','tarih','cografi','moda','insaat','son','meyve','hayvan','esya','islami','okul','tasit','sebze','muzik','spor','yiyecek','uzay','deniz','cicek','teknoloji','doga','tatil','matematik','mutfak','sanat','tarih','cografi','moda','insaat','son'];
+function getTheme(lvl){
+  if(lvl===1500) return{key:'son',...THEMES['son']};
+  if(lvl%10===0){
+    const idx=Math.floor(lvl/10)-1;
+    const k=THEME_KEYS[idx%THEME_KEYS.length]||'turk';
+    return{key:k,...THEMES[k]};
+  }
+  return{key:'turk',...THEMES['turk']};
+}
 
 // ═══════════ MOTİFLER ═══════════
 // Normal leveller için karma set: Türk motifleri + halı desenleri + Uygur/Osmanlı harfleri
@@ -264,17 +272,27 @@ Object.keys(THEMES).forEach(k=>{if(!MOTIF_SETS[k])MOTIF_SETS[k]=MOTIF_SETS.turk;
 // ═══════════ LEVEL KONFİG ═══════════
 function getLevelConfig(lvl){
   let cols,rows,pairs,hints,layers;
-  if(lvl<=10){cols=2;rows=2;pairs=2;layers=1;}
-  else if(lvl<=25){cols=4;rows=2;pairs=4;layers=1;}
-  else if(lvl<=34){cols=4;rows=4;pairs=8;layers=1;}
-  else if(lvl<=80){cols=4;rows=4;pairs=8;layers=2;}
-  else if(lvl<=110){cols=5;rows=4;pairs=10;layers=2;}
-  else if(lvl<=140){cols=6;rows=4;pairs=12;layers=3;}
-  else if(lvl<=170){cols=6;rows=6;pairs=18;layers=3;}
-  else if(lvl<=200){cols=8;rows=4;pairs=16;layers=3;}
-  else if(lvl<=225){cols=8;rows=6;pairs=24;layers=4;}
-  else{cols=10;rows=5;pairs=25;layers=4;}
-  if(lvl<=5)hints=0;else if(lvl<=30)hints=3;else if(lvl<=80)hints=2;else hints=3;
+  if(lvl<=10)       {cols=2;rows=2;pairs=2;layers=1;}
+  else if(lvl<=25)  {cols=4;rows=2;pairs=4;layers=1;}
+  else if(lvl<=50)  {cols=4;rows=4;pairs=8;layers=1;}
+  else if(lvl<=100) {cols=4;rows=4;pairs=8;layers=2;}
+  else if(lvl<=180) {cols=5;rows=4;pairs=10;layers=2;}
+  else if(lvl<=280) {cols=6;rows=4;pairs=12;layers=2;}
+  else if(lvl<=400) {cols=6;rows=4;pairs=12;layers=3;}
+  else if(lvl<=520) {cols=6;rows=6;pairs=18;layers=3;}
+  else if(lvl<=650) {cols=8;rows=4;pairs=16;layers=3;}
+  else if(lvl<=800) {cols=8;rows=4;pairs=16;layers=4;}
+  else if(lvl<=950) {cols=8;rows=6;pairs=24;layers=4;}
+  else if(lvl<=1100){cols=10;rows=5;pairs=25;layers=4;}
+  else if(lvl<=1250){cols=10;rows=5;pairs=25;layers=5;}
+  else if(lvl<=1400){cols=10;rows=6;pairs=30;layers=5;}
+  else              {cols=10;rows=6;pairs=30;layers=6;}
+  if(lvl<=5)hints=0;
+  else if(lvl<=50)hints=3;
+  else if(lvl<=200)hints=2;
+  else if(lvl<=500)hints=3;
+  else if(lvl<=900)hints=4;
+  else hints=5;
   return{cols,rows,pairs,hints,layers};
 }
 
@@ -290,10 +308,14 @@ function showMenu(){
   document.getElementById('game-screen').style.display='none';
   const el=document.getElementById('menu-screen');
   el.style.display='block';
-  const pct=Math.round(sv.done.length/250*100);
-  const tiers=[[1,10],[11,25],[26,50],[51,80],[81,110],[111,140],[141,170],[171,200],[201,225],[226,250]];
-  let h=`<div class="menu-header"><div class="logo">🕌</div><h1>Türk Motifleri Memory</h1><p>250 Level · Offline · Tema Sistemi</p></div>
-  <div class="progress-bar-wrap"><span class="pb-label">İlerleme</span><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div><span class="pb-count">${sv.done.length}/250</span></div>`;
+  const pct=Math.round(sv.done.length/1500*100);
+  const tiers=[
+    [1,10],[11,25],[26,50],[51,100],[101,180],[181,280],
+    [281,400],[401,520],[521,650],[651,800],[801,950],
+    [951,1100],[1101,1250],[1251,1400],[1401,1500]
+  ];
+  let h=`<div class="menu-header"><div class="logo">🕌</div><h1>Türk Motifleri Memory</h1><p>1500 Level · Offline · Tema Sistemi</p></div>
+  <div class="progress-bar-wrap"><span class="pb-label">İlerleme</span><div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div><span class="pb-count">${sv.done.length}/1500</span></div>`;
   tiers.forEach(([s,e])=>{
     h+=`<div class="tier-section"><div class="tier-label">${s}–${e}. Levellar</div><div class="level-grid">`;
     for(let l=s;l<=e;l++){
@@ -494,10 +516,10 @@ function flip(si,uid,el){
           remCard(a.si,a.uid);remCard(b.si,b.uid);
           rebSlot(a.si);rebSlot(b.si);
           g.flipped=[];g.lock=false;
-          if(g.matched===g.totalPairs)setTimeout(showWin,350);
+          if(g.matched===g.totalPairs)setTimeout(showWin,400);
           else setMsg(g.cfg.layers>1?'Üstteki kartları önce eşleştir!':'Kartları eşleştir!','');
-        },360);
-      },100);
+        },500);
+      },1000);
     } else {
       setMsg('Eşleşmedi!','no');
       setTimeout(()=>{
@@ -567,14 +589,14 @@ function showWin(){
   if(g.lvl>=sv.max)sv.max=g.lvl+1;
   saveSv(sv);
   const stars=g.moves<=g.totalPairs+3?3:g.moves<=g.totalPairs*2?2:1;
-  const isLast=g.lvl===250;
+  const isLast=g.lvl===1500;
   const nextTh=!isLast?getTheme(g.lvl+1):null;
   document.getElementById('game-screen').innerHTML=`<div class="screen anim-in"><div class="win-screen">
     <div class="confetti-container" id="cc"></div>
     <div style="font-size:30px;margin-bottom:.3rem">${'⭐'.repeat(stars)}</div>
     <div style="font-size:26px;margin-bottom:.3rem">${g.th.icon}</div>
     <h2>Seviye ${g.lvl} Tamamlandı!</h2>
-    <p>${isLast?'Tüm 250 seviyeyi bitirdin! Türk Hafıza Ustasısın!':(!isLast&&(g.lvl+1)%10===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
+    <p>${isLast?'Tüm 1500 seviyeyi bitirdin! Türk Hafıza Büyük Ustasısın!':(!isLast&&(g.lvl+1)%10===0?`Sırada: ${nextTh.icon} ${nextTh.name} teması!`:'Harika gidiyorsun!')}</p>
     <div class="win-stats">
       <div class="wst"><div class="wl">Hamle</div><div class="wv">${g.moves}</div></div>
       <div class="wst"><div class="wl">Çift</div><div class="wv">${g.matched}</div></div>
